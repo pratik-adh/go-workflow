@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"CRUD/api/service"
 	"CRUD/models"
-	"CRUD/service"
 
 	"github.com/gin-gonic/gin"
 )

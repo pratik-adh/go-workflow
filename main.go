@@ -1,9 +1,9 @@
 package main
 
 import (
+	"CRUD/api/routes"
 	"CRUD/config"
 	"CRUD/models"
-	"CRUD/routes"
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"

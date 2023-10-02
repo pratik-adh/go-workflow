@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	service "CRUD/service"
+	"CRUD/api/service"
 	"fmt"
 	"net/http"
 

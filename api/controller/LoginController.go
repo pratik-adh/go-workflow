@@ -1,8 +1,8 @@
 package controller
 
 import (
+	"CRUD/api/service"
 	"CRUD/models"
-	"CRUD/service"
 
 	"github.com/gin-gonic/gin"
 )

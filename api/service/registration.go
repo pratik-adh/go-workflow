@@ -7,7 +7,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-//Register NEW USER ... Insert New data
+// Insert New data into the database
 func RegisterNewUser(user *models.Registration) (err error) {
 	if err = config.DB.Create(user).Error; err != nil {
 		return err

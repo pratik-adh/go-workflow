@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"CRUD/controller"
-	"CRUD/middleware"
+	"CRUD/api/controller"
+	"CRUD/api/middleware"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -14,12 +14,12 @@ func SetupRouter() *gin.Engine {
 
 	r.POST("/register", controller.RegisterNewUser)
 
-	r.POST("/login", func(ctx *gin.Context) {
+	r.POST("/login", middleware.RateLimiter(), func(ctx *gin.Context) {
 		token := controller.Login(ctx)
 		if token != "" {
 			ctx.JSON(http.StatusOK, gin.H{
 				"status": 200,
-				"token":  token,
+				"access-token":  token,
 			})
 		} else {
 			ctx.JSON(http.StatusUnauthorized, gin.H{
