@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -12,6 +11,14 @@ import (
 
 
 var store = memory.NewStore()
+
+
+func getUserIdentifier(c *gin.Context) string {
+    // Replace this with your logic to identify users (e.g., authentication token, IP address, etc.)
+    // For the sake of example, we'll use the client's IP address as the identifier.
+    return c.ClientIP()
+}
+
 
 func RateLimiter() gin.HandlerFunc {
     // Create a memory store for rate limiting
@@ -27,8 +34,7 @@ func RateLimiter() gin.HandlerFunc {
 
     return func(c *gin.Context) {
         // Check if the request is allowed by the rate limiter
-		context, err := limiter.Get(c, c.FullPath())
-		fmt.Println("err in limiter", err)
+		context, _ := limiter.Get(c, c.FullPath() +", "+ c.ClientIP())
 
 		// Limit exceeded
 		if context.Reached {
