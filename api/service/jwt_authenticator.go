@@ -1,24 +1,24 @@
 package service
 
 import (
+	"CRUD/config"
+	"CRUD/constants"
+	"CRUD/models"
 	"fmt"
 	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/google/uuid"
 )
 
-//jwt service
+// //jwt service
 type JWTService interface {
-	GenerateToken(email string, password string, isUser bool) string
+	GenerateToken( email string, password string) string
 	ValidateToken(token string) (*jwt.Token, error)
 }
-type authCustomClaims struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	User     bool   `json:"user"`
-	jwt.StandardClaims
-}
+
+
 
 type jwtServices struct {
 	secretKey string
@@ -36,17 +36,29 @@ func JWTAuthService() JWTService {
 func getSecretKey() string {
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
-		secret = "secret"
+		secret = constants.SecretKey
 	}
 	return secret
 }
 
-func (jwtService *jwtServices) GenerateToken(email string, password string, isUser bool) string {
-	claims := &authCustomClaims{
-		email,
-		password,
-		isUser,
-		jwt.StandardClaims{
+type User struct {
+    UserID uuid.UUID
+}
+
+func (jwtService *jwtServices) GenerateToken( email string, password string) string {
+
+	var user User
+
+	if err := config.DB.Model(&models.Registration{}).Select("id").Where("email = ?", email).Scan(&user).Error; err != nil {
+		fmt.Println("error while getting uuid from token", err, user, email)
+		panic(err)
+	}
+	fmt.Println("user id", user.UserID, email)
+	claims := &models.AuthCustomClaims{
+		Email: email,
+		Password: password,
+		ID: user.UserID, 
+		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 48).Unix(),
 			Issuer:    jwtService.issure,
 			IssuedAt:  time.Now().Unix(),
@@ -54,9 +66,7 @@ func (jwtService *jwtServices) GenerateToken(email string, password string, isUs
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	//encoded string
 	t, err := token.SignedString([]byte(jwtService.secretKey))
-	// fmt.Println("token value is", t)
 	if err != nil {
 		panic(err)
 	}

@@ -29,7 +29,7 @@ func SetupRouter() *gin.Engine {
 		}
 	})
 
-	apiRoutes := r.Group("/user-api", middleware.AuthorizeJWT())
+	apiRoutes := r.Group("/user-fundamentals", middleware.AuthorizeJWT())
 	{
 		apiRoutes.GET("user", controller.GetUsers)
 		apiRoutes.POST("user", controller.CreateUser)

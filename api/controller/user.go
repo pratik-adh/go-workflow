@@ -5,12 +5,13 @@ import (
 	"net/http"
 
 	"CRUD/api/service"
+	"CRUD/constants"
 	"CRUD/models"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
 
-//GetUsers ... Get all users
 func GetUsers(c *gin.Context) {
 	var user []models.User
 	err := service.GetAllUsers(&user)
@@ -21,21 +22,37 @@ func GetUsers(c *gin.Context) {
 	}
 }
 
-//CreateUser ... Create User
 func CreateUser(c *gin.Context) {
 	var user models.User
-	c.BindJSON(&user)
+	
+	tokenString := c.GetHeader("Authorization")
+    token, err := jwt.ParseWithClaims(tokenString, &models.AuthCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+        return []byte(constants.SecretKey), nil
+    })
+    if err != nil {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+        return
+    }
 
-	err := service.CreateUser(&user)
-	if err != nil {
-		fmt.Println(err.Error())
+    // Check if the token is valid
+    if claims, ok := token.Claims.(*models.AuthCustomClaims); ok && token.Valid {
+		fmt.Println(claims.ID, claims.Email, constants.SecretKey)
+        reportingID := claims.ID
+		user.ReportingTo = reportingID
+    } else {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+    }
+
+	c.BindJSON(&user)
+	
+	errWhileCreatingNewUser := service.CreateUser(&user)
+	if errWhileCreatingNewUser != nil {
 		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "error": err.Error()})
 	} else {
 		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": user})
 	}
 }
 
-//GetUserByID ... Get the user by id
 func GetUserByID(c *gin.Context) {
 	id := c.Params.ByName("id")
 	var user models.User
@@ -47,7 +64,6 @@ func GetUserByID(c *gin.Context) {
 	}
 }
 
-//UpdateUser ... Update the user information
 func UpdateUser(c *gin.Context) {
 	var user models.User
 	id := c.Params.ByName("id")
@@ -64,7 +80,6 @@ func UpdateUser(c *gin.Context) {
 	}
 }
 
-//DeleteUser ... Delete the user
 func DeleteUser(c *gin.Context) {
 	var user models.User
 	id := c.Params.ByName("id")

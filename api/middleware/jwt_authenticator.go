@@ -11,9 +11,11 @@ import (
 
 func AuthorizeJWT() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		const BEARER_SCHEMA = "Bearer "
-		authHeader := c.GetHeader("Authorization")
-		tokenString := authHeader[len(BEARER_SCHEMA):]
+		// const BEARER_SCHEMA = "Bearer "
+		// authHeader := c.GetHeader("Authorization")
+		// tokenString := authHeader[len(BEARER_SCHEMA):]
+		
+		tokenString := c.GetHeader("Authorization")
 
 		token, err := service.JWTAuthService().ValidateToken(tokenString)
 		if token.Valid {
