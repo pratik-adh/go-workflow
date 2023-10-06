@@ -3,6 +3,7 @@ package service
 import (
 	"CRUD/config"
 	"CRUD/models"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -17,9 +18,19 @@ func GetAllUsers(user *[]models.User) (err error) {
 	return nil
 }
 
+type Error struct {
+    Number  int    `json:"Number"`
+    Message string `json:"Message"`
+}
+
 func CreateUser(c *gin.Context, user *models.User) (err error) {
 	if err = config.DB.Create(user).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "error": err.Error()})
+		byteErr, _ := json.Marshal(err)
+		var newError Error
+		json.Unmarshal((byteErr), &newError)
+		c.JSON(http.StatusNotFound, gin.H{"error": newError.Message})
+		// errors.GetErrorResponse(newError.Number, newError.Message)
+		fmt.Println(newError.Message)
 		return err
 	}
 	return nil
