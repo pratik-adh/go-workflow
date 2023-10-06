@@ -42,7 +42,7 @@ func getSecretKey() string {
 }
 
 type User struct {
-    UserID uuid.UUID
+    ID uuid.UUID
 }
 
 func (jwtService *jwtServices) GenerateToken( email string, password string) string {
@@ -50,14 +50,13 @@ func (jwtService *jwtServices) GenerateToken( email string, password string) str
 	var user User
 
 	if err := config.DB.Model(&models.Registration{}).Select("id").Where("email = ?", email).Scan(&user).Error; err != nil {
-		fmt.Println("error while getting uuid from token", err, user, email)
 		panic(err)
 	}
-	fmt.Println("user id", user.UserID, email)
+
 	claims := &models.AuthCustomClaims{
 		Email: email,
 		Password: password,
-		ID: user.UserID, 
+		ID: user.ID, 
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 48).Unix(),
 			Issuer:    jwtService.issure,

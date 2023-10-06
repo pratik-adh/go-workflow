@@ -44,8 +44,10 @@ func CreateUser(c *gin.Context) {
     }
 
 	c.BindJSON(&user)
+
+	fmt.Println(user)
 	
-	errWhileCreatingNewUser := service.CreateUser(&user)
+	errWhileCreatingNewUser := service.CreateUser(c, &user)
 	if errWhileCreatingNewUser != nil {
 		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "error": err.Error()})
 	} else {
