@@ -20,7 +20,9 @@ func AuthorizeJWT() gin.HandlerFunc {
 		token, err := service.JWTAuthService().ValidateToken(tokenString)
 		if token.Valid {
 			claims := token.Claims.(jwt.MapClaims)
-			fmt.Println("claims", claims)
+			id  := claims["ID"].(string)
+			c.Set("ReportingID", id)
+			c.Next()
 		} else {
 			fmt.Println(err)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"status": http.StatusUnauthorized, "error": "Please enter a valid token string."})

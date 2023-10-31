@@ -5,11 +5,10 @@ import (
 	"net/http"
 
 	"CRUD/api/service"
-	"CRUD/constants"
 	"CRUD/models"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func GetUsers(c *gin.Context) {
@@ -24,28 +23,15 @@ func GetUsers(c *gin.Context) {
 
 func CreateUser(c *gin.Context) {
 	var user models.User
-	
-	tokenString := c.GetHeader("Authorization")
-    token, err := jwt.ParseWithClaims(tokenString, &models.AuthCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
-        return []byte(constants.SecretKey), nil
-    })
-    if err != nil {
-        c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-        return
-    }
 
-    // Check if the token is valid
-    if claims, ok := token.Claims.(*models.AuthCustomClaims); ok && token.Valid {
-		fmt.Println(claims.ID, claims.Email, constants.SecretKey)
-        reportingID := claims.ID
-		user.ReportingTo = reportingID
-    } else {
-        c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-    }
+	reportingID := fmt.Sprintf("%v", c.MustGet("ReportingID"))
 
+	id, err := uuid.Parse(reportingID)
+	if err != nil {
+		panic(err.Error())
+	}
+	user.ReportingTo = id
 	c.BindJSON(&user)
-
-	fmt.Println(user)
 	
 	errWhileCreatingNewUser := service.CreateUser(c, &user)
 	if errWhileCreatingNewUser != nil {
