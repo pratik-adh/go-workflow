@@ -22,7 +22,7 @@ type Error struct {
     Number  int    `json:"Number"`
     Message string `json:"Message"`
 }
-
+ 
 func CreateUser(c *gin.Context, user *models.User) (err error) {
 	if err = config.DB.Create(user).Error; err != nil {
 		byteErr, _ := json.Marshal(err)

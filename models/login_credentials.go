@@ -6,8 +6,8 @@ import (
 )
 
 type LoginCredentials struct {
-	Email    string `form:"email"`
-	Password string `form:"password"`
+	Email    string `form:"email" validate:"required,email"`
+	Password string `form:"password"` 
 }
 
 type AuthCustomClaims struct {
