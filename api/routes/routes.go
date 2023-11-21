@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//SetupRouter ... Configure routes
+// SetupRouter ... Configure routes
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
 
@@ -18,8 +18,8 @@ func SetupRouter() *gin.Engine {
 		token := controller.Login(ctx)
 		if token != "" {
 			ctx.JSON(http.StatusOK, gin.H{
-				"status": 200,
-				"access-token":  token,
+				"status":       200,
+				"access-token": token,
 			})
 		} else {
 			ctx.JSON(http.StatusUnauthorized, gin.H{

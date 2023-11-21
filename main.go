@@ -3,6 +3,7 @@ package main
 import (
 	"CRUD/api/routes"
 	"CRUD/config"
+	"encoding/json"
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -16,7 +17,8 @@ func main() {
 	if err != nil {
 		fmt.Println("Status:", err)
 	}
-	fmt.Println(config.DB)
+	res, _ := json.Marshal(config.DB)
+	fmt.Println("database configurations", string(res))
 	defer config.DB.Close()
 	r := routes.SetupRouter()
 	// //running
